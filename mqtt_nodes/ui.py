@@ -20,3 +20,19 @@ class MQTTNodePanel(Panel):
         row = layout.row()
         row.label(text="This is a test")
 
+
+class MQTTPanel(Panel):
+    bl_label = 'MQTT'
+    bl_space_type = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context = 'scene'
+
+    def draw(self, context):
+        scn = bpy.context.scene
+        mqtt_settings = scn.mqtt_settings
+        layout = self.layout
+        box = layout.box()
+        col = box.column()
+        col.prop(mqtt_settings, "broker_host")
+        col.prop(mqtt_settings, "topic_prefix")
+
