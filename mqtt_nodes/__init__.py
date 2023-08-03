@@ -30,34 +30,34 @@ from bpy.types import (
 from . import ui
 
 class MQTTSettingsProp(PropertyGroup):
-    broker_host = StringProperty(
+    broker_host : StringProperty(
             name="Broker Host",
             description="IP or hostname of the broker",
             default=""
             )
-    topic_prefix = StringProperty(
+    topic_prefix : StringProperty(
             name="Topic Prefix",
             description="Prefix for the topic before all the input topics",
             default="/bl_prop_input/"
             )
 
 class MQTTInputProp(PropertyGroup):
-    topic = StringProperty(
+    topic : StringProperty(
             name="Topic",
             description="The topic postfix to get input data from",
             default=""
             )
-    property_name = StringProperty(
+    property_name : StringProperty(
             name="Custom Property Name",
             description="The name of the custom to write to in the scene",
             default="var0"
             )
-    min_value = FloatProperty(
+    min_value : FloatProperty(
             name="Min Value",
             description="If a float value, limit to this minimum",
             default=0.0
             )
-    max_value = FloatProperty(
+    max_value : FloatProperty(
             name="Max Value",
             description="If a float value, limit to this maximum",
             default=1.0

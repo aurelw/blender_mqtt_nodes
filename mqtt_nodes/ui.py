@@ -26,6 +26,7 @@ class MQTTPanel(Panel):
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context = 'scene'
+    bl_idname = 'SCENE_PT_mqtt'
 
     def draw(self, context):
         scn = bpy.context.scene
