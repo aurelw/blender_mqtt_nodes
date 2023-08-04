@@ -67,23 +67,24 @@ class MQTTInputProp(PropertyGroup):
             default=1.0
             )
 
-class MQTTInputData(PropertyGroup):
-    """Stores custom properties dynamically"""
-    pass
-
 @persistent
-def post_file_load_handler(scn):
+def post_file_load_handler(none_par):
     print("post_file_load_handler !!!!!!!!!")
-    mqtt_connection.mqtt_connection.run()
+    scn = bpy.context.scene
+    host = scn.mqtt_settings.broker_host
+    topic = scn.mqtt_settings.topic_prefix
+    # sanity check hostname
+    if len(host) > 3:
+        mqtt_connection.mqtt_connection.run(host, topic)
 
 classes = [
     MQTTSettingsProp,
     MQTTInputProp,
-    MQTTInputData,
     ui.MQTTNodePanel,
     ui.MQTTPanel,
     operators.MQTTAddInputProperty,
     operators.MQTTRemoveInputProperty,
+    operators.MQTTReconnectClient,
 ]
 
 def register():
@@ -91,11 +92,11 @@ def register():
         bpy.utils.register_class(cls)
     bpy.types.Scene.mqtt_settings = PointerProperty(type=MQTTSettingsProp)
     bpy.types.Scene.mqtt_inputs = CollectionProperty(type=MQTTInputProp)
-    bpy.types.Scene.mqtt_input_data = CollectionProperty(type=MQTTInputData)
     bpy.app.handlers.load_post.append(post_file_load_handler)
 
 
 def unregister():
+    mqtt_connection.mqtt_connection.stop()
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
     del bpy.types.Scene.mqtt_inputs

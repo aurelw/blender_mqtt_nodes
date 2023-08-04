@@ -14,8 +14,9 @@ class MQTTConnection:
         self._keep_running = False
 
     def on_connect(client, userdata, flags, rc):
-        client.subscribe(self._topic_prefix + "#")
-        print("[MQTT] connected....")
+        topic_prefix = userdata
+        client.subscribe(topic_prefix + "#")
+        print("[MQTT] connected.")
 
     def on_message(client, userdata, msg):
         var_name = str(msg.topic).split('/')[-1]
@@ -35,11 +36,14 @@ class MQTTConnection:
             scn.update_tag()
                 
     def _run(self):
+        print("[MQTT] Connecting to host:", self._broker_host)
         client = mqtt.Client()
+        client.user_data_set(self._topic_prefix)
         client.on_connect = MQTTConnection.on_connect
         client.on_message = MQTTConnection.on_message
         client.connect(self._broker_host, 1883, 60)
-        client.loop_forever()
+        while self._keep_running:
+            client.loop(timeout=1.0)
 
     def run(self, broker_host, topic_prefix):
         if self._thread:

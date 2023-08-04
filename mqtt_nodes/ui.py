@@ -36,6 +36,7 @@ class MQTTPanel(Panel):
         col = box.column()
         col.prop(mqtt_settings, "broker_host")
         col.prop(mqtt_settings, "topic_prefix")
+        col.operator("mqtt.reconnect_client", text="Reconnect")
         # props
         box = layout.box()
         col = box.column()
