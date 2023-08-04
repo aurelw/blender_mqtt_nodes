@@ -4,7 +4,7 @@ import threading
 
 import paho.mqtt.client as mqtt
 
-from . import driver_utils
+from . import driver_utils, protocol
 
 
 class MQTTConnection:
@@ -12,13 +12,14 @@ class MQTTConnection:
     def __init__(self):
         self._thread = None
         self._keep_running = False
+        self._do_pub_manifest = False
 
-    def on_connect(client, userdata, flags, rc):
+    def _on_connect(client, userdata, flags, rc):
         topic_prefix = userdata
         client.subscribe(topic_prefix + "#")
         print("[MQTT] connected.")
 
-    def on_message(client, userdata, msg):
+    def _on_message(client, userdata, msg):
         var_name = str(msg.topic).split('/')[-1]
         scn = bpy.context.scene
         try:
@@ -34,16 +35,27 @@ class MQTTConnection:
         if do_update_drivers:
             driver_utils.update_all_drivers()
             scn.update_tag()
+
+
+    def _pub_manifest(self, client):
+        manifest = protocol.get_manifest()
+        client.publish(self._topic_prefix + "manifest", manifest,
+                       qos=0, retain=True)
                 
     def _run(self):
         print("[MQTT] Connecting to host:", self._broker_host)
         client = mqtt.Client()
         client.user_data_set(self._topic_prefix)
-        client.on_connect = MQTTConnection.on_connect
-        client.on_message = MQTTConnection.on_message
+        client.on_connect = MQTTConnection._on_connect
+        client.on_message = MQTTConnection._on_message
         client.connect(self._broker_host, 1883, 60)
+        self._pub_manifest(client)
         while self._keep_running:
-            client.loop(timeout=1.0)
+            client.loop(timeout=0.2)
+            #FIXME may need locking for race condition
+            if self._do_pub_manifest:
+                self._pub_manifest(client)
+                self._do_pub_manifest = False
 
     def run(self, broker_host, topic_prefix):
         if self._thread:
@@ -58,6 +70,9 @@ class MQTTConnection:
         self._thread = threading.Thread(target=self._run)
         self._keep_running = True
         self._thread.start()
+
+    def pub_manifest(self):
+        self._do_pub_manifest = True
 
     def stop(self):
         if self._thread:

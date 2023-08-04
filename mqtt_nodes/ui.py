@@ -42,6 +42,8 @@ class MQTTPanel(Panel):
         col = box.column()
         for idx, input_prop in enumerate(scn.mqtt_inputs):
             row = col.row()
+            if input_prop.property_name == 'NOT_SET':
+                row.alert = True
             row.prop(input_prop, "property_name", text="")
             row.operator("mqtt.remove_input_property", text="", icon="CANCEL").property_index = idx
         col = box.column()

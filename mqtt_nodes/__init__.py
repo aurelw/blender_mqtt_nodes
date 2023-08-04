@@ -45,6 +45,9 @@ class MQTTSettingsProp(PropertyGroup):
             default="/bl_prop_input/"
             )
 
+def update_input_property(prop, context):
+    mqtt_connection.mqtt_connection.pub_manifest()
+
 class MQTTInputProp(PropertyGroup):
     topic : StringProperty(
             name="Topic",
@@ -54,7 +57,8 @@ class MQTTInputProp(PropertyGroup):
     property_name : StringProperty(
             name="Custom Property Name",
             description="The name of the custom to write to in the scene",
-            default="var0"
+            default="NOT_SET",
+            update=update_input_property
             )
     min_value : FloatProperty(
             name="Min Value",
