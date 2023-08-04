@@ -3,12 +3,16 @@ import bpy
 def update_drivers_on_animation_data(anim_data):
     """Hacky workaround to trigger driver update."""
     for driver in anim_data.drivers:
-        driver.driver.expression = driver.driver.expression
+        print("Update Driver")
+        driver.driver.expression += " "
+        driver.driver.expression = driver.driver.expression[:-1]
+
 
 def update_drivers_for_ids(ids):
     for identity in ids:
-        if idtentiy.animation_data:
-            update_drivers_for_ids(identity.animation_data)
+        if hasattr(identity, "animation_data") and \
+           identity.animation_data:
+            update_drivers_on_animation_data(identity.animation_data)
 
 def update_all_drivers():
     update_drivers_for_ids(bpy.data.objects)

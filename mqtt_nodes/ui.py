@@ -36,4 +36,14 @@ class MQTTPanel(Panel):
         col = box.column()
         col.prop(mqtt_settings, "broker_host")
         col.prop(mqtt_settings, "topic_prefix")
+        # props
+        box = layout.box()
+        col = box.column()
+        for idx, input_prop in enumerate(scn.mqtt_inputs):
+            row = col.row()
+            row.prop(input_prop, "property_name", text="")
+            row.operator("mqtt.remove_input_property", text="", icon="CANCEL").property_index = idx
+        col = box.column()
+        col.operator("mqtt.add_input_property", text="ADD")
+        
 
